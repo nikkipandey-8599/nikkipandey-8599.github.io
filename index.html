@@ -985,6 +985,38 @@
                     <p>At RUSHL, we believe in providing high-quality, reliable tools that are accessible to everyone. Our mission is to empower individuals, professionals, and businesses by offering seamless solutions that enhance productivity and creativity. Whether you're working with documents, images, audio, or code, RUSHL has you covered.</p>
                 </div>
             </section>
+            <!-- ✅ Why Choose RUSHL -->
+<section class="section" id="why-us">
+  <h2>Why Choose RUSHL?</h2>
+  <div class="section-content">
+    <ul>
+      <li>✔️ 100% Free Online Tools</li>
+      <li>✔️ Privacy-Focused (No file uploads to server)</li>
+      <li>✔️ 35+ Tools in One Place — No Install Needed</li>
+      <li>✔️ Works on Any Device</li>
+      <li>✔️ Updated Regularly Based on User Feedback</li>
+    </ul>
+  </div>
+</section>
+
+
+            <!-- ✅ FAQ Section -->
+<section class="section" id="faq">
+  <h2>Frequently Asked Questions</h2>
+  <div class="section-content">
+    <h4>1. Are the tools on RUSHL free to use?</h4>
+    <p>Yes, all tools are completely free and work directly in your browser.</p>
+    
+    <h4>2. Do I need to create an account?</h4>
+    <p>No account or sign-up is required. Simply click and start using tools instantly.</p>
+    
+    <h4>3. Is it safe to upload my files?</h4>
+    <p>Yes, all processing happens on your device — files never leave your browser.</p>
+    
+    <h4>4. Can I use these tools on my phone?</h4>
+    <p>Absolutely! RUSHL is fully responsive and works on desktop, tablet, and mobile.</p>
+  </div>
+</section>
 
             <!-- Contact Section -->
             <section class="section" id="contact">
@@ -996,6 +1028,22 @@
             </section>
         </main>
     </div>
+<!-- ✅ Feature Request Section -->
+<section class="section" id="feature-request" style="text-align:center;">
+  <h2>Got an Idea for a New Feature?</h2>
+  <p>We're always improving! Tell us what tools or features you'd love to see next.</p>
+  <a href="mailto:nikkipandey392@gmail.com?subject=Feature Request" class="tool-button" style="display:inline-block;margin-top:1rem;">
+    Submit a Feature Request
+  </a>
+</section>
+    <!-- ✅ Recently Used Tools Section -->
+<section class="section" id="recentlyUsed">
+  <h2>Recently Used Tools</h2>
+  <div class="section-content" id="recentToolsContainer">
+    <p>No tools used yet.</p>
+  </div>
+</section>
+
 
     <!-- Footer -->
     <footer class="footer">
@@ -3507,97 +3555,123 @@
                 updateFileList();
             });
         }
+function setupPdfSplitTool(modalOverlay) {
+    const pdfFileInput = modalOverlay.querySelector('#pdfFile');
+    const fileUploadArea = modalOverlay.querySelector('#pdfUploadArea');
+    const pageRangeInput = modalOverlay.querySelector('#pageRange');
+    const splitPdfBtn = modalOverlay.querySelector('#splitPdfBtn');
+    const resetSplitBtn = modalOverlay.querySelector('#resetSplitBtn');
 
-        function setupPdfSplitTool(modalOverlay) {
-            // Implementation for PDF split tool
-            const pdfFileInput = modalOverlay.querySelector('#pdfFile');
-            const fileUploadArea = modalOverlay.querySelector('#pdfUploadArea');
-            const pageRangeInput = modalOverlay.querySelector('#pageRange');
-            const splitPdfBtn = modalOverlay.querySelector('#splitPdfBtn');
-            const resetSplitBtn = modalOverlay.querySelector('#resetSplitBtn');
-            
-            // File upload area click handler
-            fileUploadArea.addEventListener('click', () => {
-                pdfFileInput.click();
-            });
-            
-            // Split PDF button handler
-            splitPdfBtn.addEventListener('click', async () => {
-                if (!pdfFileInput.files[0]) {
-                    alert('Please upload a PDF file.');
-                    return;
-                }
-                
-                if (!pageRangeInput.value.trim()) {
-                    alert('Please specify a page range.');
-                    return;
-                }
-                
-                splitPdfBtn.innerHTML = '<span class="loading"></span> Splitting...';
-                splitPdfBtn.disabled = true;
-                
-                try {
-                    const { PDFDocument } = PDFLib;
-                    const file = pdfFileInput.files[0];
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdfDoc = await PDFDocument.load(arrayBuffer);
-                    
-                    // Parse page ranges (e.g., "1-3, 5, 7-10")
-                    const pageRanges = pageRangeInput.value.split(',').map(range => range.trim());
-                    const pagesToExtract = [];
-                    
-                    for (const range of pageRanges) {
-                        if (range.includes('-')) {
-                            const [start, end] = range.split('-').map(num => parseInt(num.trim()) - 1);
-                            for (let i = start; i <= end; i++) {
-                                if (i >= 0 && i < pdfDoc.getPageCount()) {
-                                    pagesToExtract.push(i);
-                                }
-                            }
-                        } else {
-                            const pageNum = parseInt(range) - 1;
-                            if (pageNum >= 0 && pageNum < pdfDoc.getPageCount()) {
-                                pagesToExtract.push(pageNum);
-                            }
-                        }
-                    }
-                    
-                    // Create new PDF with selected pages
-                    const newPdf = await PDFDocument.create();
-                    const pages = await newPdf.copyPages(pdfDoc, pagesToExtract);
-                    pages.forEach(page => newPdf.addPage(page));
-                    
-                    // Save and download
-                    const pdfBytes = await newPdf.save();
-                    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'split-document.pdf';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    // Reset button state
-                    splitPdfBtn.innerHTML = 'Split PDF';
-                    splitPdfBtn.disabled = false;
-                } catch (error) {
-                    console.error('Error splitting PDF:', error);
-                    alert('An error occurred while splitting PDF. Please try again.');
-                    
-                    // Reset button state
-                    splitPdfBtn.innerHTML = 'Split PDF';
-                    splitPdfBtn.disabled = false;
-                }
-            });
-            
-            // Reset button handler
-            resetSplitBtn.addEventListener('click', () => {
-                pdfFileInput.value = '';
-                pageRangeInput.value = '';
-            });
+    // Create a visual upload preview area
+    const uploadInfo = document.createElement('div');
+    uploadInfo.id = 'pdfUploadInfo';
+    uploadInfo.style.marginTop = '10px';
+    uploadInfo.style.fontSize = '14px';
+    uploadInfo.style.color = '#fff';
+    uploadInfo.style.textAlign = 'center';
+    uploadInfo.style.display = 'none';
+    fileUploadArea.appendChild(uploadInfo);
+
+    // File upload area click handler
+    fileUploadArea.addEventListener('click', () => {
+        pdfFileInput.click();
+    });
+
+    // When user selects a file → show file name and highlight area
+    pdfFileInput.addEventListener('change', () => {
+        if (pdfFileInput.files.length > 0) {
+            const fileName = pdfFileInput.files[0].name;
+            uploadInfo.innerHTML = `<span style="color:#00ffcc;">📄 ${fileName}</span> uploaded successfully`;
+            uploadInfo.style.display = 'block';
+            fileUploadArea.style.border = '2px solid #00ffcc';
+            fileUploadArea.style.background = 'rgba(0,255,204,0.1)';
+        } else {
+            uploadInfo.style.display = 'none';
+            fileUploadArea.style.border = '2px dashed #888';
+            fileUploadArea.style.background = 'transparent';
         }
+    });
+
+    // Split PDF button handler
+    splitPdfBtn.addEventListener('click', async () => {
+        if (!pdfFileInput.files[0]) {
+            alert('Please upload a PDF file.');
+            return;
+        }
+
+        if (!pageRangeInput.value.trim()) {
+            alert('Please specify a page range.');
+            return;
+        }
+
+        splitPdfBtn.innerHTML = '<span class="loading"></span> Splitting...';
+        splitPdfBtn.disabled = true;
+
+        try {
+            const { PDFDocument } = PDFLib;
+            const file = pdfFileInput.files[0];
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+
+            // Parse page ranges (e.g., "1-3, 5, 7-10")
+            const pageRanges = pageRangeInput.value.split(',').map(range => range.trim());
+            const pagesToExtract = [];
+
+            for (const range of pageRanges) {
+                if (range.includes('-')) {
+                    const [start, end] = range.split('-').map(num => parseInt(num.trim()) - 1);
+                    for (let i = start; i <= end; i++) {
+                        if (i >= 0 && i < pdfDoc.getPageCount()) pagesToExtract.push(i);
+                    }
+                } else {
+                    const pageNum = parseInt(range) - 1;
+                    if (pageNum >= 0 && pageNum < pdfDoc.getPageCount()) pagesToExtract.push(pageNum);
+                }
+            }
+
+            if (pagesToExtract.length === 0) {
+                alert('Invalid page range.');
+                splitPdfBtn.innerHTML = 'Split PDF';
+                splitPdfBtn.disabled = false;
+                return;
+            }
+
+            const newPdf = await PDFDocument.create();
+            const pages = await newPdf.copyPages(pdfDoc, pagesToExtract);
+            pages.forEach(page => newPdf.addPage(page));
+
+            const pdfBytes = await newPdf.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'split-document.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            splitPdfBtn.innerHTML = 'Split PDF';
+            splitPdfBtn.disabled = false;
+        } catch (error) {
+            console.error('Error splitting PDF:', error);
+            alert('An error occurred while splitting PDF. Please try again.');
+
+            splitPdfBtn.innerHTML = 'Split PDF';
+            splitPdfBtn.disabled = false;
+        }
+    });
+
+    // Reset button handler
+    resetSplitBtn.addEventListener('click', () => {
+        pdfFileInput.value = '';
+        pageRangeInput.value = '';
+        uploadInfo.style.display = 'none';
+        fileUploadArea.style.border = '2px dashed #888';
+        fileUploadArea.style.background = 'transparent';
+    });
+}
+
 
         function setupImageToPdfTool(modalOverlay) {
             // Implementation for image to PDF tool
@@ -8407,7 +8481,65 @@ function setupAudioTrimmerTool(modalOverlay) {
         // Initialize the application when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
-</body>
-</html>
+    <script>
+document.getElementById('scrollToTop').addEventListener('click', () => {
+  window.scrollTo({top: 0, behavior: 'smooth'});
+});
+</script>
+    <!-- ✅ Recently Used Tools Script -->
+<script>
+  // Function to update recently used tools
+  function updateRecentlyUsed(toolName, toolId) {
+    let recent = JSON.parse(localStorage.getItem('recentTools')) || [];
+    
+    // Prevent duplicates and limit to last 5 items
+    recent = recent.filter(tool => tool.id !== toolId);
+    recent.unshift({ name: toolName, id: toolId });
+    recent = recent.slice(0, 5); // Keep only latest 5
+
+    // Store back in localStorage
+    localStorage.setItem('recentTools', JSON.stringify(recent));
+
+    // Display the section
+    displayRecentlyUsed();
+  }
+
+  // Display recently used tools
+  function displayRecentlyUsed() {
+    const container = document.getElementById('recentToolsContainer');
+    const recent = JSON.parse(localStorage.getItem('recentTools')) || [];
+
+    if (recent.length === 0) {
+      container.innerHTML = '<p>No tools used yet.</p>';
+      return;
+    }
+
+    container.innerHTML = recent.map(tool => `
+      <a href="#${tool.id}" class="tool-button" style="display:inline-block;margin:0.5rem;">
+        ${tool.name}
+      </a>
+    `).join('');
+  }
+
+  // Hook into tool opens (your existing code should call this)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.tool-card')) {
+      const toolCard = e.target.closest('.tool-card');
+      const toolName = toolCard.querySelector('h3').innerText;
+      const toolId = toolCard.getAttribute('data-id');
+
+      updateRecentlyUsed(toolName, toolId);
+    }
+  });
+
+  // Initialize on page load
+  document.addEventListener("DOMContentLoaded", displayRecentlyUsed);
+</script>
+
+
+    <!-- Adsterra Ad Code -->
 <script async="async" data-cfasync="false" src="//pl28000173.effectivegatecpm.com/d178885bd24c6eaf517ba233cebb5151/invoke.js"></script>
 <div id="container-d178885bd24c6eaf517ba233cebb5151"></div>
+</body>
+</html>
+
